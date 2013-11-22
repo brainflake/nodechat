@@ -1,0 +1,40 @@
+<div class="row">
+    <div class="md-col 12">
+      <div class="form-group">
+        <input type="text" class="form-control" name="nickname" placeholder="nickname">
+      </div>
+      <div class="form-group">
+        <input type="text" class="form-control" name="message" placeholder="Type a message...">
+      </div>
+    </div>
+</div>
+
+<div id="chats" class="row">
+
+</div>
+
+<script type="text/javascript">
+  $(function() {
+    var socket = io.connect('http://localhost');
+
+    socket.on('message', function(data) {
+      console.log(data);
+      var content = data.content;
+      var userNickname = data.user;
+      var $userNicknameDiv = $('<div>').addClass('col-md-12').append($('<strong>').text(userNickname));
+      var $contentDiv = $('<div>').addClass('col-md-12').text(content);
+      $('#chats').prepend($contentDiv).prepend($userNicknameDiv);
+    });
+
+    $('input[name=message]').on('keyup', function(data) {
+      if (data.keyCode == 13) {
+        socket.emit('message', {
+          content: $('input[name=message]').val(),
+          user: $('input[name=nickname]').val()
+        });
+
+        $('input[name=message]').val('');
+      }
+    });
+  });
+</script>
